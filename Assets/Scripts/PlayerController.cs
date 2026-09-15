@@ -4,36 +4,65 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 8f;
+
     [SerializeField] private float jumpForce = 10f;
 
     [SerializeField] private bool isGrounded;
 
-    [SerializeField] private float minGroundNormalY = 10f;
-    
-    Rigidbody2D rb;
-    private float moveInput;
+    [SerializeField] private float minGroundNormalY = 0.7f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    Rigidbody2D rb;
+    private SpriteRenderer spriteRender;
+    private Animator animator;
+    private float moveInput;
+    private bool touchingWall;
+    private float wallNormalX;
+    private bool isLanding;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        spriteRender =  GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
+        isLanding = animator.GetCurrentAnimatorStateInfo(0).IsName("landed");
         isGrounded = false;
-        rb.linearVelocity = new Vector2 (moveInput * moveSpeed, rb.linearVelocity.y);
+
+        if (isLanding)
+        {
+            rb.linearVelocity = new Vector2 (0f, rb.linearVelocity.y);
+        } 
+        else 
+        {
+            rb.linearVelocity = new Vector2 (moveInput * moveSpeed, rb.linearVelocity.y);
+        }
+
+        animator.SetFloat("yVelocity", rb.linearVelocity.y);
+
+    }
+
+    private void LateUpdate()
+    {
+        animator.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+        animator.SetBool("GroundedYes", isGrounded);
     }
 
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>().x;
+
+        if (moveInput > 0)
+            spriteRender.flipX = false;
+        else if (moveInput < 0)
+            spriteRender.flipX = true;
     }
 
     public void OnJump(InputValue value)
     {
-        if(value.isPressed && isGrounded)
+        if(value.isPressed && isGrounded && !isLanding)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
@@ -43,11 +72,12 @@ public class PlayerController : MonoBehaviour
     {
         foreach (ContactPoint2D contact in collision.contacts)
         {
-            if(contact.normal.y >= minGroundNormalY)
+            if (contact.normal.y >= minGroundNormalY)
             {
                 isGrounded = true;
                 break;
             }
         }
+
     }
 }
