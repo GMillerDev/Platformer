@@ -18,10 +18,12 @@ public class PlayerController : MonoBehaviour
     private bool touchingWall;
     private float wallNormalX;
     private bool isLanding;
+    private Vector3 spawnPosition;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        spawnPosition = transform.position;
         spriteRender =  GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
     }
@@ -79,5 +81,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+    }
+
+    public void Respawn()
+    {
+        transform.position = spawnPosition;
+        rb.linearVelocity = Vector2.zero;
     }
 }

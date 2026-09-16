@@ -7,7 +7,7 @@ using UnityEngine;
     {
         if (other.CompareTag("Player"))
             {
-                gameManager.FellOutOfBounds();
+                gameManager.PlayerDied();
             }
     }
 }

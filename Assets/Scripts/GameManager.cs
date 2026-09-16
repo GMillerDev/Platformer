@@ -4,9 +4,19 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject winScreen;
     [SerializeField] private GameObject loseScreen;
+    [SerializeField] private PlayerController player;
+    [SerializeField] private HeartsUI heartsUI;
+
+    private const int maxHealth = 6;
+    private int currentHealth;
 
     public bool won { get; private set; }
-    public bool fellOutOfBounds { get; private set; }
+
+    private void Start()
+    {
+        currentHealth = maxHealth;
+        heartsUI.UpdateHearts(currentHealth);
+    }
 
     public void Win()
     {
@@ -15,13 +25,19 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    public void FellOutOfBounds()
+    public void PlayerDied()
     {
-        fellOutOfBounds = true;
-        if (loseScreen != null)
+        currentHealth = Mathf.Max(currentHealth - 1, 0);
+        heartsUI.UpdateHearts(currentHealth);
+
+        if (currentHealth <= 0)
         {
             loseScreen.SetActive(true);
+            Time.timeScale = 0f;
         }
-        Time.timeScale = 0f;
+        else
+        {
+            player.Respawn();
+        }
     }
 }
