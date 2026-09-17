@@ -83,9 +83,15 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void Respawn()
+    private Vector3 spawnPosition;
+    void Start()
     {
-        transform.position = spawnPosition;
+        rb = GetComponent<Rigidbody2D>();
+        spawnPosition = transform.position;
+    }
+    public void Respawn(Vector3? overridePosition = null)
+    {
+        transform.position = overridePosition ?? spawnPosition;
         rb.linearVelocity = Vector2.zero;
     }
 }
