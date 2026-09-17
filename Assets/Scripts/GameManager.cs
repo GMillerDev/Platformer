@@ -7,10 +7,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private HeartsUI heartsUI;
 
+    [Header("Respawn point")]
+    [SerializeField] private Transform spawnPoint;
+
     private const int maxHealth = 6;
     private int currentHealth;
 
     public bool won { get; private set; }
+    public int deaths { get; private set; }
 
     private void Start()
     {
@@ -27,6 +31,9 @@ public class GameManager : MonoBehaviour
 
     public void PlayerDied()
     {
+        if (won) return;
+
+        deaths++;
         currentHealth = Mathf.Max(currentHealth - 1, 0);
         heartsUI.UpdateHearts(currentHealth);
 
@@ -37,7 +44,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            player.Respawn();
+            Vector3? target = spawnPoint != null ? spawnPoint.position : (Vector3?)null;
+            player.Respawn(target);
         }
     }
 }
